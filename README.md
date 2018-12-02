@@ -7,6 +7,6 @@ My Advent of Code 2018 Repo. In a Swift Playground
 
 **[Part 1](AdventOfCode2018.playground/Pages/Day1Part1.xcplaygroundpage/Contents.swift)**
 
-**[Part 2](AdventOfCode2018.playground/Pages/Day1Part1.xcplaygroundpage/Contents.swift)**
+**[Part 2](AdventOfCode2018.playground/Pages/Day1Part2.xcplaygroundpage/Contents.swift)**
 
 ### Day 2
