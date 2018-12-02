@@ -18,13 +18,8 @@ public class Problem<Input, Result: Equatable> {
     }
     
     public func test(input: Input, expected: Result) -> TestResult {
-        if skipTests {
-            return .skipped
-        }
-        
-        if testFunc(input) == expected {
-            return .passed
-        }
+        if skipTests { return .skipped }
+        if testFunc(input) == expected { return .passed }
         return .failed
     }
     
@@ -34,7 +29,5 @@ public class Problem<Input, Result: Equatable> {
 }
 
 extension Problem.TestResult: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        return rawValue
-    }
+    public var debugDescription: String { return rawValue }
 }

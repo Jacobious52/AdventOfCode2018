@@ -3,9 +3,7 @@ import Foundation
 extension String: Error {}
 
 extension String: LocalizedError {
-    public var errorDescription: String? {
-        return self
-    }
+    public var errorDescription: String? { return self }
 }
 
 public func getInputPath() throws -> String {
