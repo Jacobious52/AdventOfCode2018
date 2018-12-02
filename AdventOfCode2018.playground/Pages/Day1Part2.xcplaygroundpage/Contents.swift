@@ -31,7 +31,7 @@ problem.test(input: [+7, +7, -2, -7, -4], expected: 14)
 
 //: ### Find Solution
 
-let inputPath = Bundle.main.path(forResource: "input1", ofType: "txt")!
+let inputPath = try getInputPath()
 let numbers = try [Int].load(fromFile: inputPath)
 
 problem.run(input: numbers)

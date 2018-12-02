@@ -3,5 +3,7 @@
     <pages>
         <page name='Day1Part1'/>
         <page name='Day1Part2'/>
+        <page name='Day2Part1'/>
+        <page name='Day2Part2'/>
     </pages>
 </playground>
