@@ -7,9 +7,7 @@ import Foundation
 //: ### Problem definition
 
 let problem = Problem { (numbers: [Int]) -> Int in
-    numbers.reduce(0) { x, y in
-        x + y
-    }
+    numbers.reduce(0, +)
 }
 
 //: ### Tests

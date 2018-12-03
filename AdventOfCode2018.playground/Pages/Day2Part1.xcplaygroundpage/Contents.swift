@@ -3,7 +3,7 @@
 import Foundation
 
 //: # Advent of code 2018 playground
-//: ## Day 1 Part 2
+//: ## Day 2 Part 2
 
 //: ### Problem definition
 

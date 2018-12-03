@@ -1,7 +1,7 @@
 # AdventOfCode2018
-My Advent of Code 2018 Repo. In a Swift Playground
+My Advent of Code 2018 Repo. In various langauges and tools.
 
-## Problems each in separate xcode playgrounds page
+**AdventOfCode2018.playground** - Swift Playground problems live here
 
 ### Day 1
 
@@ -14,4 +14,10 @@ My Advent of Code 2018 Repo. In a Swift Playground
 **[Part 1](AdventOfCode2018.playground/Pages/Day2Part1.xcplaygroundpage/Contents.swift)**
 
 **[Part 2](AdventOfCode2018.playground/Pages/Day2Part2.xcplaygroundpage/Contents.swift)**
+
+### Day 3
+
+**[Part 1](AdventOfCode2018.playground/Pages/Day3Part2.xcplaygroundpage/Contents.swift)**
+
+**[Part 2](AdventOfCode2018.playground/Pages/Day3Part2.xcplaygroundpage/Contents.swift)**
 
