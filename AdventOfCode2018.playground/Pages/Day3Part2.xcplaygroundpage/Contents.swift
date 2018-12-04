@@ -102,7 +102,7 @@ problem.test(input: claims, expected: 3)
 
 //: ### Find Solution
 
-//let input = try getInputString().lines.map(parseClaim)
-//problem.run(input: input)
+let input = try getInputString().lines.map(parseClaim)
+problem.run(input: input)
 
 //: [Next](@next)
