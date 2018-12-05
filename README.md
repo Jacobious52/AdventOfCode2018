@@ -26,3 +26,11 @@ My Advent of Code 2018 Repo. In various langauges and tools.
 **[Part 1](AdventOfCode2018.playground/Pages/Day4Part1.xcplaygroundpage/Contents.swift)**
 
 **[Part 2](AdventOfCode2018.playground/Pages/Day4Part2.xcplaygroundpage/Contents.swift)**
+
+### Day 5
+
+**[Part 1](AdventOfCode2018.playground/Pages/Day5Part1.xcplaygroundpage/Contents.swift)**
+
+**[Part 2](AdventOfCode2018.playground/Pages/Day5Part2.xcplaygroundpage/Contents.swift)**
+
+
