@@ -7,22 +7,6 @@ import Foundation
 
 //: ### Problem definition
 
-struct Point : Hashable {
-    let x: Int
-    let y: Int
-    
-    var hashValue : Int {
-        get {
-            return x.hashValue &* 31 &+ y.hashValue
-        }
-    }
-}
-
-func ==(lhs: Point, rhs: Point) -> Bool {
-    return lhs.x == rhs.x && lhs.y == rhs.y
-}
-
-
 struct Claim {
     var id: Int
     var top: Point
