@@ -39,5 +39,8 @@ My Advent of Code 2018 Repo. In (probably) various langauges and tools. Not goin
 
 **[Part 2](AdventOfCode2018.playground/Pages/Day6Part2.xcplaygroundpage/Contents.swift)**
 
+### Day 7
 
+**[Part 1](AdventOfCode2018.playground/Pages/Day7Part1.xcplaygroundpage/Contents.swift)**
 
+**[Part 2](AdventOfCode2018.playground/Pages/Day7Part2.xcplaygroundpage/Contents.swift)**
