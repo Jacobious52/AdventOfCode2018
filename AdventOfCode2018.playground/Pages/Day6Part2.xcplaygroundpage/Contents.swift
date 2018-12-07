@@ -2,9 +2,9 @@
 
 import Foundation
 
-//: ### Problem definition
-
 //: ## Day 6 Part 2
+
+//: ### Problem definition
 
 func distSum(point: Point, points: [Point]) -> Int {
     let manhattan = points.map {

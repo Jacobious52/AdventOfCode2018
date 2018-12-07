@@ -2,9 +2,9 @@
 
 import Foundation
 
-//: ### Problem definition
-
 //: ## Day 6 Part 1
+
+//: ### Problem definition
 
 func nearest(point: Point, points: [Point]) -> Int {
     let manhattan = points.map {
