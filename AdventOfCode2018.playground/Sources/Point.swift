@@ -4,6 +4,11 @@ public struct Point : Hashable {
     public let x: Int
     public let y: Int
     
+    public init() {
+        self.x = 0
+        self.y = 0
+    }
+    
     public init(string: String) {
         let nums = string.components(separatedBy: CharacterSet.decimalDigits.inverted)
         self.x = Int(nums[0])!
