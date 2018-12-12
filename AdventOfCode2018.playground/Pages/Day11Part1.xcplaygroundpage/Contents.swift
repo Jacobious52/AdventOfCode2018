@@ -2,7 +2,7 @@
 
 import Foundation
 
-//: ## Day 10 Part 1
+//: ## Day 11 Part 1
 
 //: ### Problem definition
 
