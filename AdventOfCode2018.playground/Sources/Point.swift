@@ -4,6 +4,8 @@ public struct Point : Hashable {
     public let x: Int
     public let y: Int
     
+    public static let zero = Point()
+    
     public init() {
         self.x = 0
         self.y = 0
@@ -20,6 +22,10 @@ public struct Point : Hashable {
         self.y = y
     }
     
+    public var reversed: Point {
+        return Point(x: y, y: x)
+    }
+    
     public var hashValue : Int {
         get {
             return x.hashValue &* 31 &+ y.hashValue
@@ -27,6 +33,16 @@ public struct Point : Hashable {
     }
 }
 
+extension Point: CustomStringConvertible {
+    public var description: String {
+        return "(\(x), \(y))"
+    }
+}
+
 public func ==(lhs: Point, rhs: Point) -> Bool {
     return lhs.x == rhs.x && lhs.y == rhs.y
+}
+
+public func +(lhs: Point, rhs: Point) -> Point {
+    return Point(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
 }
