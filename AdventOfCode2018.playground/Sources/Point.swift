@@ -25,12 +25,6 @@ public struct Point : Hashable {
     public var reversed: Point {
         return Point(x: y, y: x)
     }
-    
-    public var hashValue : Int {
-        get {
-            return x.hashValue &* 31 &+ y.hashValue
-        }
-    }
 }
 
 extension Point: CustomStringConvertible {

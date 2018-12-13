@@ -6,17 +6,7 @@ import Foundation
 
 //: ### Problem definition
 
-extension Point: CustomStringConvertible {
-    public var description: String {
-        return "(\(x), \(y))"
-    }
-}
-
-extension Point {
-    public func distanceSquared(from: Point) -> Int {
-        return Int(pow(Double(abs(from.x - x) + abs(from.y - y)), 2))
-    }
-    
+extension Point {    
     public func area(from: Point) -> Int {
         return abs(from.x - x) * abs(from.y - y)
     }
