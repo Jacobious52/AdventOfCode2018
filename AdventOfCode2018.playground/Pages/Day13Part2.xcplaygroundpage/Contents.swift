@@ -72,13 +72,13 @@ class Cart: CustomStringConvertible {
             "^": "<",
             "<": "v",
             "v": ">",
-            ]
+        ]
         let rightTurns: [Character:Character] = [
             ">": "v",
             "^": ">",
             "<": "^",
             "v": "<",
-            ]
+        ]
         
         move(delta: directionDelta)
         
