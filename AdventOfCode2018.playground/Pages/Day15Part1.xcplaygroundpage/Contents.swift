@@ -123,9 +123,9 @@ class Unit {
         return Point.readingOrder(a: a.pos, b: b.pos)
     }
     
-    class func find(at: Point, units: [Unit]) -> Unit? {
-        return units.first(where: { $0.pos == at })
-    }
+    //    class func findAlive(at: Point, units: [Unit]) -> Unit? {
+    //        return units.first(where: { $0.isAlive && $0.pos == at })
+    //    }
     
     init(race: Race, row: Int, col: Int) {
         self.pos = Point(x: row, y: col)
@@ -135,27 +135,35 @@ class Unit {
     func takeTurn(map: inout Map, units: inout [Unit]) {
         //print("turn", race)
         
-        let targets = units.filter({$0.race != self.race})
-        if targets.isEmpty { return }
-        
-        if attack(map: map, allUnits: units, targets: targets) {
+        if !isAlive {
             return
         }
         
-        if move(map: map, allUnits: units, targets: targets) {
-            attack(map: map, allUnits: units, targets: targets)
+        var targets = units.filter({$0.isAlive && $0.race != self.race})
+        if targets.isEmpty { return }
+        
+        var unitLookup: [Point:Unit] = units.reduce(into: [:]) { $0[$1.pos] = $1 }
+        
+        if attack(map: &map, targets: &targets, unitLookup: &unitLookup) {
+            return
+        }
+        
+        if move(map: &map, targets: &targets, unitLookup: &unitLookup) {
+            attack(map: &map, targets: &targets, unitLookup: &unitLookup)
         }
     }
     
-    @discardableResult func attack(map: Map, allUnits: [Unit], targets: [Unit]) -> Bool {
+    @discardableResult func attack(map: inout Map, targets: inout [Unit], unitLookup: inout [Point:Unit]) -> Bool {
         let inRange = pos.adjacent4().filter { (p) -> Bool in
-            if !p.inside(left: 0, top: 0, width: map.count, height: map.first!.count) {
+            if !p.inside(width: map.count, height: map.first!.count) {
                 return false
             }
-            if Unit.find(at: p, units: targets) == nil {
-                return false
+            if let unit = unitLookup[p] {
+                if targets.contains(where: { $0.pos == unit.pos }) {
+                    return true
+                }
             }
-            return true
+            return false
         }
         
         if inRange.isEmpty {
@@ -163,14 +171,23 @@ class Unit {
         }
         
         // attack
+        let preference = inRange.compactMap { unitLookup[$0] }.sorted { (a, b) -> Bool in
+            if a.health == b.health {
+                return Point.readingOrder(a: a.pos, b: b.pos)
+            }
+            return a.health < b.health
+        }
+        
+        //debugPrint("adj", preference.first!)
+        preference.first?.health -= attackPower
         
         return true
     }
     
-    @discardableResult func move(map: Map, allUnits: [Unit], targets: [Unit]) -> Bool {
+    @discardableResult func move(map: inout Map, targets: inout [Unit], unitLookup: inout [Point:Unit]) -> Bool {
         let adjTargets = targets.reduce(into: [Point]()) { (points, target) in
             let open = target.pos.adjacent4().filter { (p) -> Bool in
-                if !p.inside(left: 0, top: 0, width: map.count, height: map.first!.count) {
+                if !p.inside(width: map.count, height: map.first!.count) {
                     return false
                 }
                 if map[p.x][p.y] == .wall {
@@ -197,11 +214,15 @@ class Unit {
             let current = fringe.removeFirst()
             visited.insert(current)
             
+            if targets.allSatisfy({ visited.contains($0.pos) }) {
+                break
+            }
+            
             for next in current.adjacent4().sorted(by: Point.readingOrder).reversed()
                 where next.inside(width: map.count, height: map.first!.count) &&
                     !visited.contains(next) &&
                     map[next.x][next.y] == .empty &&
-                    Unit.find(at: next, units: allUnits) == nil {
+                    unitLookup[next] == nil {
                         
                         distances[next] = distances[current, default: 0] + 1
                         paths[next] = current
@@ -245,17 +266,23 @@ extension Unit: CustomStringConvertible {
     }
 }
 
+extension Unit: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "\(race.rawValue)(\(health)) - \(pos)"
+    }
+}
+
 let problem = Problem { (map: Map, units: [Unit]) -> Int in
     var map = map
     var units = units
     
     // rounds
-    for _ in 0...3 {
+    var round = 0
+    while true {
         units.sort(by: Unit.readingOrder)
         units.forEach { $0.takeTurn(map: &map, units: &units) }
-        // units.forEach { $0.move() }
-        
-        print(map: map, units: units)
+        units = units.filter { $0.isAlive }
+        //print(map: map, units: units)
         
         if units.allSatisfy({$0.race == .goblin}) {
             print("goblins win")
@@ -265,29 +292,20 @@ let problem = Problem { (map: Map, units: [Unit]) -> Int in
             print("elfs win")
             break
         }
+        
+        //        if round % 10 == 0 {
+        //            print(map: map, units: units)
+        //        }
+        
+        round += 1
     }
-    
-    return 0
+    print(round, units.reduce(0) { $0 + $1.health })
+    return round * units.reduce(0) { $0 + $1.health }
 }
 
 //: ### Tests
 
-let exampleInput = """
-#########
-#G..G..G#
-#.......#
-#.......#
-#G..E..G#
-#.......#
-#.......#
-#G..G..G#
-#########
-"""
-let (exampleMap, exampleUnits) = try parseMap(string: exampleInput)
-print(map: exampleMap, units: exampleUnits)
-print(problem.test(input: (exampleMap, exampleUnits), expected: 0))
-
-//let a = try parseMap(string: """
+//let exampleInput = """
 //#######
 //#.G...#
 //#...EG#
@@ -295,11 +313,84 @@ print(problem.test(input: (exampleMap, exampleUnits), expected: 0))
 //#..G#E#
 //#.....#
 //#######
-//""")
-//print(problem.test(input: a, expected: 27730))
+//"""
+//let (exampleMap, exampleUnits) = try parseMap(string: exampleInput)
+//print(map: exampleMap, units: exampleUnits)
+//print(problem.test(input: (exampleMap, exampleUnits), expected: 27730))
+
+let a = try parseMap(string: """
+#######
+#.G...#
+#...EG#
+#.#.#G#
+#..G#E#
+#.....#
+#######
+""")
+print(problem.test(input: a, expected: 27730))
+
+let b = try parseMap(string: """
+#######
+#G..#E#
+#E#E.E#
+#G.##.#
+#...#E#
+#...E.#
+#######
+""")
+print(problem.test(input: b, expected: 36334))
+
+let c = try parseMap(string: """
+#######
+#E..EG#
+#.#G.E#
+#E.##E#
+#G..#.#
+#..E#.#
+#######
+""")
+print(problem.test(input: c, expected: 39514))
+
+let d = try parseMap(string: """
+#######
+#E.G#.#
+#.#G..#
+#G.#.G#
+#G..#.#
+#...E.#
+#######
+""")
+print(problem.test(input: d, expected: 27755))
+
+let e = try parseMap(string: """
+#######
+#.E...#
+#.#..G#
+#.###.#
+#E#G#G#
+#...#G#
+#######
+""")
+print(problem.test(input: e, expected: 28944))
+
+let f = try parseMap(string: """
+#########
+#G......#
+#.E.#...#
+#..##..G#
+#...##..#
+#...#...#
+#.G...G.#
+#.....G.#
+#########
+""")
+print(problem.test(input: f, expected: 18740))
 
 
 //: ### Find Solution
 
+let inputString = try getInputString()
+let input = try parseMap(string: inputString)
+print(problem.run(input: input))
 
 //: [Next](@next)
