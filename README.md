@@ -1,5 +1,5 @@
 # AdventOfCode2018
-My Advent of Code 2018 Repo. In (probably) various langauges and tools. Not going for best or fastest solutions, this is just for some fun and practice.
+My Advent of Code 2018 Repo. Not going for best solutions or times just practicing programming in Swift
 
 **AdventOfCode2018.playground** - Swift Playground problems live here. Playgrounds is really slow so running most problems with full input requires compiling swift files as binary.
 
