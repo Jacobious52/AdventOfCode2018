@@ -47,7 +47,10 @@ func parseMap(string: String) throws -> (Map, [Unit]) {
 }
 
 func print(map: Map, units: [Unit], marked: [Point] = [], mark: String = "") {
+    print(" ", separator: "", terminator: "")
+    print((0...units.count).reduce(into: "", {$0 += String($1)}))
     for row in map.enumerated() {
+        print(row.offset, separator: "", terminator: "")
         for col in row.element.enumerated() {
             if let entity = units.first(where: { $0.pos == Point(x: row.offset, y: col.offset) }) {
                 print(entity, separator: "", terminator: "")
@@ -59,7 +62,8 @@ func print(map: Map, units: [Unit], marked: [Point] = [], mark: String = "") {
             }
             print(map[row.offset][col.offset], separator: "", terminator: "")
         }
-        print()
+        let unitsOnRow = units.filter { $0.row == row.offset }.sorted(by: Unit.readingOrder)
+        print("\t", unitsOnRow.map({$0.debugDescription}).joined(separator: " "))
     }
     print()
 }
@@ -193,6 +197,9 @@ class Unit {
                 if map[p.x][p.y] == .wall {
                     return false
                 }
+                if unitLookup[p] != nil {
+                    return false
+                }
                 return true
             }
             points.append(contentsOf: open)
@@ -204,42 +211,60 @@ class Unit {
         
         //print(map: map, units: allUnits, marked: adjTargets, mark: "?")
         
-        // dka
-        var fringe: [Point] = [pos]
-        var visited: Set<Point> = []
-        var distances: [Point:Int] = [:]
-        var paths: [Point:Point] = [:]
+        // djka
+        
+        var fringe: [Point] = []
+        var dist: [Point:Int] = [:]
+        var prev: [Point:Point?] = [:]
+        
+        for row in map.enumerated() {
+            for col in row.element.enumerated() {
+                let v = Point(x: row.offset, y: col.offset)
+                if !v.inside(width: map.first!.count, height: map.count) ||
+                    map[v.x][v.y] == .wall ||
+                    unitLookup[v] != nil {
+                    continue
+                }
+                dist[v] = Int.max
+                prev[v] = nil
+                fringe.append(v)
+            }
+        }
+        
+        dist[pos] = 0
+        prev[pos] = nil
+        fringe.append(pos)
         
         while !fringe.isEmpty {
-            let current = fringe.removeFirst()
-            visited.insert(current)
+            fringe.sort { (a, b) -> Bool in
+                if dist[a]! == dist[b]! {
+                    return Point.readingOrder(a: a, b: b)
+                }
+                return dist[a]! < dist[b]!
+            }
+            let u = fringe.removeFirst()
             
-            if targets.allSatisfy({ visited.contains($0.pos) }) {
+            if dist[u]! == Int.max {
                 break
             }
             
-            for next in current.adjacent4().sorted(by: Point.readingOrder).reversed()
-                where next.inside(width: map.count, height: map.first!.count) &&
-                    !visited.contains(next) &&
-                    map[next.x][next.y] == .empty &&
-                    unitLookup[next] == nil {
-                        
-                        distances[next] = distances[current, default: 0] + 1
-                        paths[next] = current
-                        fringe.append(next)
+            for v in u.adjacent4() where fringe.contains(v) {
+                let alt = dist[u]! + 1
+                if alt < dist[v]! || (alt == dist[v]! && prev[v] != nil && Point.readingOrder(a: v, b: prev[v]!!)) {
+                    dist[v] = alt
+                    prev[v] = u
+                }
             }
         }
-        //print(paths)
         
-        let reachable = adjTargets.filter { visited.contains($0) }
+        let reachable = adjTargets.filter { dist[$0] != Int.max }
         //print(map: map, units: allUnits, marked: reachable, mark: "@")
-        
         if reachable.isEmpty {
             return false
         }
         
-        let minDist = reachable.compactMap({distances[$0]}).min()!
-        let minSteps = reachable.filter { distances[$0] == minDist }
+        let minDist = reachable.compactMap({dist[$0]}).min()!
+        let minSteps = reachable.filter { dist[$0] == minDist }
         //print(map: map, units: allUnits, marked: minSteps, mark: "!")
         
         guard let closest = minSteps.sorted(by: Point.readingOrder).first else {
@@ -250,8 +275,8 @@ class Unit {
         // move 1 step
         
         var back = closest
-        while paths[back]! != pos {
-            back = paths[back]!
+        while prev[back]! != pos {
+            back = prev[back]!!
         }
         
         pos = back
@@ -268,7 +293,7 @@ extension Unit: CustomStringConvertible {
 
 extension Unit: CustomDebugStringConvertible {
     var debugDescription: String {
-        return "\(race.rawValue)(\(health)) - \(pos)"
+        return "\(race.rawValue)(\(health))"
     }
 }
 
@@ -282,6 +307,8 @@ let problem = Problem { (map: Map, units: [Unit]) -> Int in
         units.sort(by: Unit.readingOrder)
         units.forEach { $0.takeTurn(map: &map, units: &units) }
         units = units.filter { $0.isAlive }
+        
+        //print("round:", round)
         //print(map: map, units: units)
         
         if units.allSatisfy({$0.race == .goblin}) {
@@ -293,12 +320,14 @@ let problem = Problem { (map: Map, units: [Unit]) -> Int in
             break
         }
         
+        round += 1
         //        if round % 10 == 0 {
         //            print(map: map, units: units)
         //        }
-        
-        round += 1
     }
+    
+    print(map: map, units: units)
+    
     print(round, units.reduce(0) { $0 + $1.health })
     return round * units.reduce(0) { $0 + $1.health }
 }
